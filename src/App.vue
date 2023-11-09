@@ -19,12 +19,18 @@
           v-for="item of cpNavigationItems"
           :key="item.id"
           :index="item.id"
-          >{{ item.name }}</el-menu-item
-        >
+          ><div class="flex justify-between w-full h-9 gap-2">
+            <span>{{ item.name }}</span>
+            <div class="flex justify-center items-center h-full">
+              <el-icon @click="removeItem(item.id)"><Minus /></el-icon>
+            </div></div
+        ></el-menu-item>
         <el-menu-item index="add-camera"
-          ><div>
+          ><div class="flex justify-between w-full h-9 gap-2">
             <span class="mr-1">Добавить новую камеру</span>
-            <el-icon><CirclePlus /></el-icon></div
+            <div class="flex justify-center items-center h-full">
+              <el-icon><Plus /></el-icon>
+            </div></div
         ></el-menu-item>
       </el-sub-menu>
     </el-menu>
@@ -68,6 +74,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
 
   store.dispatch("navigation/selectItem", key);
 };
+
+function removeItem(id: string) {
+  store.dispatch("navigation/removeCameraStream", id);
+}
 </script>
 
 <style>

@@ -46,7 +46,23 @@ const createNavigationStore = (app: App) => {
 		}
   
 		state.selectedItem = state.items[idx];
-	  },
+	},
+	SELECT_FIRST_ITEM: (state: INavigationState) => {
+		if (state.items.length === 0) {
+			state.selectedItem = null;
+			return;
+		}
+  
+		state.selectedItem = state.items[0];
+	},
+	SELECT_LAST_ITEM: (state: INavigationState) => {
+		if (state.items.length === 0) {
+			state.selectedItem = null;
+			return;
+		}
+  
+		state.selectedItem = state.items[state.items.length - 1];
+	},
     SET_OPENED_CAMERA_DIALOG: (state: INavigationState, payload: boolean) => {
       state.addCameraDialogOpened = payload;
     },
@@ -65,6 +81,7 @@ const createNavigationStore = (app: App) => {
         };
 
         await store.commit("ADD_ITEM", createdStream);
+		await store.commit("SELECT_LAST_ITEM");
       } catch (error) {
         ElMessage({
           message: "Что-то пошло не так",
@@ -76,6 +93,7 @@ const createNavigationStore = (app: App) => {
     async removeCameraStream(store: any, id: string) {
       try {
         await store.commit("REMOVE_ITEM", id);
+		await store.commit("SELECT_FIRST_ITEM");
       } catch (error) {
         ElMessage({
           message: "Что-то пошло не так",
