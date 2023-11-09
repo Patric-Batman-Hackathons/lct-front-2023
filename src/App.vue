@@ -1,33 +1,46 @@
 <template>
   <div>
-  <el-menu
-    :default-active="activeIndex"
-    class="el-menu-demo"
-    mode="horizontal"
-    :ellipsis="false"
-    menu-trigger="click"
-    @select="handleSelect"
-  >
-    <el-menu-item index="0">
-      <img style="width: 20px" src="vite.svg" alt="Element logo" />
-    </el-menu-item>
-    <div class="flex-grow" />
-    <el-menu-item index="1">Просмотр</el-menu-item>
-    <el-sub-menu index="2">
-      <template #title>Выбор камеры</template>
-      <el-menu-item
-        v-for="item of cpNavigationItems"
-        :key="item.id"
-        :index="item.id"
-        >{{ item.name }}</el-menu-item
-      >
-      <el-menu-item index="add-camera"><div>
-        <span class="mr-1">Добавить новую камеру</span>
-        <el-icon><CirclePlus /></el-icon>
-      </div></el-menu-item>
-    </el-sub-menu>
-  </el-menu>
-  <AddCamera v-model="centerDialogVisible" />
+    <el-menu
+      :default-active="activeIndex"
+      class="el-menu-demo"
+      mode="horizontal"
+      :ellipsis="false"
+      menu-trigger="click"
+      @select="handleSelect"
+    >
+      <el-menu-item index="0">
+        <img style="width: 20px" src="vite.svg" alt="Element logo" />
+      </el-menu-item>
+      <div class="flex-grow" />
+      <el-menu-item index="1">Просмотр</el-menu-item>
+      <el-sub-menu index="2">
+        <template #title>Выбор камеры</template>
+        <el-menu-item
+          v-for="item of cpNavigationItems"
+          :key="item.id"
+          :index="item.id"
+          >{{ item.name }}</el-menu-item
+        >
+        <el-menu-item index="add-camera"
+          ><div>
+            <span class="mr-1">Добавить новую камеру</span>
+            <el-icon><CirclePlus /></el-icon></div
+        ></el-menu-item>
+      </el-sub-menu>
+    </el-menu>
+
+    <!-- Main page -->
+    <div v-if="selectedItem">
+      <div class="flex justify-center items-center px-20 py-16">
+        <img
+          :src="selectedItem.url"
+          alt="Изображение"
+          class="w-full rounded-lg"
+        />
+      </div>
+    </div>
+    <!-- Poppers -->
+    <AddCamera v-model="centerDialogVisible" />
   </div>
 </template>
 
@@ -40,18 +53,21 @@ const store = useStore();
 
 ///// COMPUTED FROM STORE ////
 const cpNavigationItems = computed(() => store.getters["navigation/items"]);
+const selectedItem = computed(() => store.getters["navigation/selectedItem"]);
 
 //// VARIABLES ////
 const activeIndex = ref("1");
-const centerDialogVisible = ref(false)
+const centerDialogVisible = ref(false);
 
 const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath);
-  if (key === 'add-camera') {
+  if (key === "add-camera") {
     centerDialogVisible.value = true;
+    return;
   }
-};
 
+  store.dispatch("navigation/selectItem", key);
+};
 </script>
 
 <style>

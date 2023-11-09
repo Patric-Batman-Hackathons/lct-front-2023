@@ -2,6 +2,7 @@ import { ICameraStream } from "../common";
 
 export interface INavigationState {
     items: ICameraStream[];
+    selectedItem: ICameraStream | null;
     addCameraDialogOpened: boolean;
 }
 

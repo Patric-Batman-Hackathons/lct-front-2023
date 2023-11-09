@@ -6,10 +6,12 @@ import {
 import { ICameraStream } from "../../interfaces/common";
 import { ElMessage } from "element-plus";
 import { v4 as uuidv4 } from "uuid";
+import { IMAGES } from "../../mocks";
 
 const createNavigationStore = (app: App) => {
   const state = (): INavigationState => ({
     items: [],
+	selectedItem: null,
     addCameraDialogOpened: false,
   });
 
@@ -17,6 +19,9 @@ const createNavigationStore = (app: App) => {
     items: (state: INavigationState) => {
       return state.items;
     },
+	selectedItem: (state: INavigationState) => {
+		return state.selectedItem;
+	  },
     addCameraDialogOpened: (state: INavigationState) => {
       return state.addCameraDialogOpened;
     },
@@ -34,6 +39,14 @@ const createNavigationStore = (app: App) => {
 
       state.items.splice(idx, 1);
     },
+	SELECT_ITEM: (state: INavigationState, id: string) => {
+		const idx = state.items.findIndex((item) => item.id === id);
+		if (idx === -1) {
+		  return;
+		}
+  
+		state.selectedItem = state.items[idx];
+	  },
     SET_OPENED_CAMERA_DIALOG: (state: INavigationState, payload: boolean) => {
       state.addCameraDialogOpened = payload;
     },
@@ -42,9 +55,12 @@ const createNavigationStore = (app: App) => {
   const actions = {
     async addCameraStream(store: any, payload: ICreateCameraStreamPayload) {
       try {
+        const randomIndex = Math.floor(Math.random() * IMAGES.length);
+        const imageUrl = IMAGES[randomIndex];
+
         const createdStream: ICameraStream = {
           id: uuidv4(),
-		  url: '',
+          url: imageUrl,
           ...payload,
         };
 
@@ -57,7 +73,7 @@ const createNavigationStore = (app: App) => {
       }
     },
 
-    async removeCameraStream(store: any, id: number) {
+    async removeCameraStream(store: any, id: string) {
       try {
         await store.commit("REMOVE_ITEM", id);
       } catch (error) {
@@ -68,23 +84,12 @@ const createNavigationStore = (app: App) => {
       }
     },
 
-    async openAddCameraDialog(store: any) {
+    async selectItem(store: any, id: string) {
       try {
-        await store.commit("SET_OPENED_CAMERA_DIALOG", true);
+		await store.commit("SELECT_ITEM", id);
       } catch (error) {
         ElMessage({
-          message: "Что-то пошло не так",
-          type: "error",
-        });
-      }
-    },
-
-    async closeAddCameraDialog(store: any) {
-      try {
-        await store.commit("SET_OPENED_CAMERA_DIALOG", false);
-      } catch (error) {
-        ElMessage({
-          message: "Что-то пошло не так",
+          message: "Не удалось получить изображение",
           type: "error",
         });
       }
