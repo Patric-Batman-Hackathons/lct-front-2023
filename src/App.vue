@@ -99,6 +99,16 @@ function onSelected() {
     return;
   }
 
+  cameraSrc.value.onerror = () => {
+    if (fullscreenLoading.value) {
+      fullscreenLoading.value.close();
+      ElMessage({
+        message: "Не удалось получить изображение, камера неактивна",
+        type: "error",
+      });
+    }
+  }
+
   const result = Promise.race([
     new Promise((res) => {
       if (!cameraSrc.value) {
@@ -117,7 +127,10 @@ function onSelected() {
       };
     }),
     new Promise((res) => {
-      setTimeout(() => res(false), 15000);
+      setTimeout(() => {
+        fullscreenLoading.value.close();
+        res(false);
+      }, 15000);
     }),
   ]);
 
