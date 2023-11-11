@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  lct-front:
+    image: sxhornet/lct-front
+    restart: always
+    # env_file: 
+    #   - .env
+    ports:
+      - '80:80'
+      - '443:443'

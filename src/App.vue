@@ -9,7 +9,7 @@
       @select="handleSelect"
     >
       <el-menu-item index="0">
-        <img style="width: 20px" src="vite.svg" alt="Element logo" />
+        <img style="width: 20px" src="/vite.svg" alt="Element logo" />
       </el-menu-item>
       <div class="flex-grow" />
       <el-menu-item index="screenshot" v-if="selectedItem"
