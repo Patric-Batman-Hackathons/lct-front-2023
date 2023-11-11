@@ -16,6 +16,11 @@ import "./index.css";
 // VUEX //
 import createStore from "./store";
 
+// AXIOS //
+import VueAxios from 'vue-axios';
+import axiosInstance from './plugins/axios';
+import { AxiosStatic } from 'axios';
+
 // COMPONENTS //
 import AddCamera from "./components/AddCamera.vue";
 
@@ -23,6 +28,9 @@ const app = createApp(App);
 
 //@ts-ignore
 app.config.devtools = true;
+
+app.use(VueAxios, axiosInstance as AxiosStatic);
+app.provide('axios', app.config.globalProperties.axios);
 
 app.use(router);
 app.use(ElementPlus);

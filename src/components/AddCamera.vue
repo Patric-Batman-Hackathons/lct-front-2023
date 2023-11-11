@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="value" title="Добавить камеру" width="30%" align-center>
+  <el-dialog v-model="value" title="Добавить камеру" width="360px" align-center>
     <el-form
       label-position="top"
       label-width="100px"
