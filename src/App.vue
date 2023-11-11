@@ -15,7 +15,7 @@
       <el-menu-item index="screenshot" v-if="selectedItem"
         >Сделать снимок</el-menu-item
       >
-      <el-menu-item index="screenshot">Просмотр</el-menu-item>
+      <el-menu-item index="1">Просмотр</el-menu-item>
       <el-sub-menu index="2">
         <template #title>Выбор камеры</template>
         <el-menu-item
@@ -46,6 +46,7 @@
           ref="cameraSrc"
           alt="Изображение"
           class="w-full rounded-lg"
+          crossorigin="anonymous"
         />
       </div>
     </div>
@@ -81,11 +82,16 @@ const handleSelect = (key: string, keyPath: string[]) => {
     return;
   }
 
+  if (key === "screenshot") {
+    saveImage();
+    return;
+  }
+
   fullscreenLoading.value = ElLoading.service({
     lock: true,
-    text: 'Загрузка',
-    background: 'rgba(0, 0, 0, 0.7)',
-  })
+    text: "Загрузка",
+    background: "rgba(0, 0, 0, 0.7)",
+  });
 
   store.dispatch("navigation/selectItem", {
     id: key,
@@ -100,14 +106,16 @@ function onSelected() {
   }
 
   cameraSrc.value.onerror = () => {
+    store.dispatch("navigation/deselectItem");
     if (fullscreenLoading.value) {
       fullscreenLoading.value.close();
+      fullscreenLoading.value = null;
       ElMessage({
         message: "Не удалось получить изображение, камера неактивна",
         type: "error",
       });
     }
-  }
+  };
 
   const result = Promise.race([
     new Promise((res) => {
@@ -117,17 +125,28 @@ function onSelected() {
       }
 
       if (!fullscreenLoading.value) {
-          res(true);
-          return;
+        res(true);
+        return;
       }
 
       cameraSrc.value.onload = () => {
+        if (!fullscreenLoading.value) {
+          res(true);
+          return;
+        }
+
         fullscreenLoading.value.close();
+        fullscreenLoading.value = null;
         res(true);
       };
     }),
     new Promise((res) => {
       setTimeout(() => {
+        if (!fullscreenLoading.value) {
+          res(true);
+          return;
+        }
+
         fullscreenLoading.value.close();
         res(false);
       }, 15000);
@@ -137,11 +156,32 @@ function onSelected() {
   result.then((value) => {
     if (!value) {
       ElMessage({
-        message: "Не удалось получить изображение, камера неактивна",
+        message: "Не удалось получить изображение, сервер недоступен",
         type: "error",
       });
     }
   });
+}
+
+function saveImage() {
+  const imageElement = cameraSrc.value;
+  if (!imageElement) {
+    return;
+  }
+
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  canvas.width = imageElement.naturalWidth;
+  canvas.height = imageElement.naturalHeight;
+
+  context?.drawImage(imageElement, 0, 0);
+
+  const dataUrl = canvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = "savedCameraFrame.png";
+  link.click();
 }
 
 function removeItem(id: string) {

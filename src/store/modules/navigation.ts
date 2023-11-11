@@ -73,6 +73,9 @@ const createNavigationStore = (app: App) => {
 
       state.selectedItem = state.items[state.items.length - 1];
     },
+    DESELECT_ITEM: (state: INavigationState) => {
+      state.selectedItem = null;
+    },
     SET_OPENED_CAMERA_DIALOG: (state: INavigationState, payload: boolean) => {
       state.addCameraDialogOpened = payload;
     },
@@ -117,6 +120,10 @@ const createNavigationStore = (app: App) => {
           type: "error",
         });
       }
+    },
+
+    async deselectItem(store: any) {
+      await store.commit("DESELECT_ITEM");
     },
 
     async selectItem(
