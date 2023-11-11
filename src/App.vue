@@ -58,6 +58,7 @@
 import { ref } from "vue";
 import { computed, onMounted } from "vue";
 import { useStore } from "./main";
+import { ElLoading, ElMessage } from "element-plus";
 
 const store = useStore();
 
@@ -68,6 +69,7 @@ const selectedItem = computed(() => store.getters["navigation/selectedItem"]);
 //// VARIABLES ////
 const activeIndex = ref("1");
 const centerDialogVisible = ref(false);
+const fullscreenLoading = ref<any | null>(null);
 
 //// REFS ////
 const cameraSrc = ref<HTMLImageElement | null>(null);
@@ -79,23 +81,54 @@ const handleSelect = (key: string, keyPath: string[]) => {
     return;
   }
 
+  fullscreenLoading.value = ElLoading.service({
+    lock: true,
+    text: 'Загрузка',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+
   store.dispatch("navigation/selectItem", {
     id: key,
     onSelected: onSelected,
   });
-
 };
 
 function onSelected() {
-  console.log('onSelect');
   if (!cameraSrc.value) {
-    console.warn('Camera not loaded yet');
+    console.warn("Camera not loaded yet");
     return;
   }
 
-  cameraSrc.value.onload = () => {
-    console.log('Loaded');
-  }
+  const result = Promise.race([
+    new Promise((res) => {
+      if (!cameraSrc.value) {
+        res(true);
+        return;
+      }
+
+      if (!fullscreenLoading.value) {
+          res(true);
+          return;
+      }
+
+      cameraSrc.value.onload = () => {
+        fullscreenLoading.value.close();
+        res(true);
+      };
+    }),
+    new Promise((res) => {
+      setTimeout(() => res(false), 15000);
+    }),
+  ]);
+
+  result.then((value) => {
+    if (!value) {
+      ElMessage({
+        message: "Не удалось получить изображение, камера неактивна",
+        type: "error",
+      });
+    }
+  });
 }
 
 function removeItem(id: string) {
