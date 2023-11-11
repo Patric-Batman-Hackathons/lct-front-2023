@@ -52,7 +52,7 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useStore } from "./main";
 
 const store = useStore();
@@ -78,6 +78,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
 function removeItem(id: string) {
   store.dispatch("navigation/removeCameraStream", id);
 }
+
+onMounted(() => {
+  store.dispatch("navigation/getStreams");
+})
 </script>
 
 <style>

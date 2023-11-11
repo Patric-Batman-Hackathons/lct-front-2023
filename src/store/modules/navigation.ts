@@ -118,6 +118,9 @@ const createNavigationStore = (app: App) => {
 
     async selectItem(store: any, id: string) {
       try {
+        await axios.post("stream/active/", {
+          uid: id,
+        });
         await store.commit("SELECT_ITEM", id);
       } catch (error) {
         console.error(error);
@@ -130,7 +133,7 @@ const createNavigationStore = (app: App) => {
 
     async getStreams(store: any) {
       try {
-        const { data: streams } = await axios.get<IGetStream>("stream/get");
+        const { data: streams } = await axios.get<IGetStream>("stream/get/");
         const mappedStreams: ICameraStream[] = streams.map((item) =>
           convertStream(item)
         );

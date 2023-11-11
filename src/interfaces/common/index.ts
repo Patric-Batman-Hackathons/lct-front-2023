@@ -25,3 +25,7 @@ export interface IPostStream {
   password: string;
   url: string;
 }
+
+export interface ISelectStream {
+    uid: string;
+}

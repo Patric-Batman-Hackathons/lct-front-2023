@@ -9,7 +9,7 @@
       <el-form-item label="Название камеры">
         <el-input v-model="payload.name" />
       </el-form-item>
-      <el-form-item label="IP адрес">
+      <el-form-item label="RTSP URL">
         <el-input v-model="payload.ip" />
       </el-form-item>
       <el-form-item label="Логин">
