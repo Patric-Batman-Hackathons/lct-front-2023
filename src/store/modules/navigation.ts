@@ -90,7 +90,10 @@ const createNavigationStore = (app: App) => {
           ...payload,
         };
 
-        await axios.post<any>('stream/post/', convertFrontStream(createdStream));
+        await axios.post<any>(
+          "stream/post/",
+          convertFrontStream(createdStream)
+        );
 
         await store.commit("ADD_ITEM", createdStream);
         await store.commit("SELECT_LAST_ITEM");
@@ -116,12 +119,23 @@ const createNavigationStore = (app: App) => {
       }
     },
 
-    async selectItem(store: any, id: string) {
+    async selectItem(
+      store: any,
+      payload: {
+        id: string;
+        onSelect: () => void;
+      }
+    ) {
       try {
+        const { id, onSelected } = payload;
         await axios.post("stream/active/", {
           uid: id,
         });
         await store.commit("SELECT_ITEM", id);
+
+        if (onSelected) {
+          onSelected();
+        }
       } catch (error) {
         console.error(error);
         ElMessage({
@@ -142,6 +156,25 @@ const createNavigationStore = (app: App) => {
         console.error(error);
         ElMessage({
           message: "Не удалось получить добавленные камеры",
+          type: "error",
+        });
+      }
+    },
+
+    async createScreenshot(store: any) {
+      try {
+        const selectedItem = store.state.selectedItem;
+        if (!selectedItem) {
+          ElMessage({
+            message: "Сначала выберите камеру",
+            type: "warning",
+          });
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+        ElMessage({
+          message: "Не удалось сохранить изображение",
           type: "error",
         });
       }
