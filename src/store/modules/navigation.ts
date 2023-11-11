@@ -123,7 +123,7 @@ const createNavigationStore = (app: App) => {
       store: any,
       payload: {
         id: string;
-        onSelect: () => void;
+        onSelected: () => void;
       }
     ) {
       try {
